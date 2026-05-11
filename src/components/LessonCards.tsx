@@ -1,12 +1,22 @@
 import type { Lesson } from "../types";
 import { minutesToTime } from "../utils/time";
 
-interface LessonCardsProps {
+/** Props for {@link LessonCards}. */
+export interface LessonCardsProps {
+  /** The lesson currently in progress, or `null` if none. */
   currentLesson: Lesson | null;
+  /** The next upcoming lesson, or `null` if none remain today. */
   nextLesson: Lesson | null;
+  /** Current time as minutes since midnight (used for progress calculation). */
   currentMin: number;
 }
 
+/**
+ * Renders two side-by-side cards showing the current and next lessons.
+ *
+ * The current-lesson card includes a progress bar indicating how far through
+ * the lesson the user is. Cards are dimmed when no lesson is available.
+ */
 export default function LessonCards({
   currentLesson,
   nextLesson,

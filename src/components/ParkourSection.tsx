@@ -2,6 +2,16 @@ import { useState } from "react";
 import type { VideoType } from "../types";
 import { videoOptions, videoLabels } from "../data/videos";
 
+/**
+ * Renders the "Background Entertainment" section with an embedded YouTube
+ * video that autoplays muted in a loop.
+ *
+ * The user can switch between the available {@link VideoType} options using
+ * the button row below the player. New video options are added in
+ * `src/data/videos.ts` and `src/types/index.ts`.
+ *
+ * This component is self-contained and accepts no props.
+ */
 export default function ParkourSection() {
   const [activeVideo, setActiveVideo] = useState<VideoType>("minecraft");
 

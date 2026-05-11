@@ -1,16 +1,29 @@
 import type { DayInfo } from "../types";
 import { minutesToTime, getCurrentMinutes } from "../utils/time";
+import { DAY_START_MIN } from "../config";
 
-const DAY_START = 8 * 60;
-
-interface TimerSectionProps {
+/** Props for {@link TimerSection}. */
+export interface TimerSectionProps {
+  /** Seconds remaining until Feierabend. */
   secondsLeft: number;
+  /** Feierabend time as minutes since midnight. */
   feierabendMin: number;
+  /** Current day information computed by {@link useDayInfo}. */
   dayInfo: DayInfo;
+  /** Whether there are any non-cancelled lessons today. */
   hasLessons: boolean;
+  /** The current date/time, updated every second by {@link useTimer}. */
   now: Date;
 }
 
+/**
+ * The primary countdown section.
+ *
+ * Displays hours / minutes / seconds remaining, the target Feierabend time,
+ * contextual badges (Work Day / School Day), and an overall day-progress bar.
+ *
+ * The countdown label adapts to the day type returned by `dayInfo`.
+ */
 export default function TimerSection({
   secondsLeft,
   feierabendMin,
@@ -27,8 +40,8 @@ export default function TimerSection({
   const sStr = seconds.toString().padStart(2, "0");
 
   const currentMin = getCurrentMinutes(now);
-  const dayLength = feierabendMin - DAY_START;
-  const elapsed = currentMin - DAY_START;
+  const dayLength = feierabendMin - DAY_START_MIN;
+  const elapsed = currentMin - DAY_START_MIN;
   const progress = Math.min(100, Math.max(0, (elapsed / dayLength) * 100));
 
   let timerLabel = "TIME UNTIL FEIERABEND";

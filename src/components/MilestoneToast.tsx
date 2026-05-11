@@ -1,11 +1,24 @@
 import { useEffect } from "react";
 import type { MilestoneData } from "../types";
 
-interface MilestoneToastProps {
+/** Props for {@link MilestoneToast}. */
+export interface MilestoneToastProps {
+  /**
+   * The milestone to display, or `null` when no toast should be visible.
+   * Changing this to a non-null value starts the auto-dismiss timer.
+   */
   milestone: MilestoneData | null;
+  /** Called when the toast should be hidden (after 3 s or manually). */
   onDismiss: () => void;
 }
 
+/**
+ * A non-blocking toast notification that appears when a countdown milestone
+ * is reached.
+ *
+ * Auto-dismisses after 3 seconds. The toast slides in/out using the
+ * `show` CSS class.
+ */
 export default function MilestoneToast({
   milestone,
   onDismiss,

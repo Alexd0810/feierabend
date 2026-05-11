@@ -1,8 +1,30 @@
+/**
+ * Resolves the browser's AudioContext constructor, falling back to the
+ * webkit-prefixed variant for older Safari versions.
+ *
+ * @returns The AudioContext constructor, or `null` when the Web Audio API is
+ *          unavailable (e.g. in a test environment).
+ */
+function getAudioContext(): typeof AudioContext | null {
+  return (
+    window.AudioContext ??
+    (window as unknown as Record<string, typeof AudioContext>)['webkitAudioContext'] ??
+    null
+  );
+}
+
+/**
+ * Plays the Feierabend victory fanfare — a four-note ascending arpeggio
+ * (C5 → E5 → G5 → C6) using the Web Audio API.
+ *
+ * Silently does nothing when the Web Audio API is unavailable.
+ */
 export function playFeierabendSound(): void {
-  const AudioCtx = window.AudioContext ?? (window as unknown as Record<string, typeof AudioContext>)['webkitAudioContext'];
+  const AudioCtx = getAudioContext();
   if (!AudioCtx) return;
   const audioContext = new AudioCtx();
-  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+  // C5, E5, G5, C6
+  const notes = [523.25, 659.25, 783.99, 1046.5];
   notes.forEach((freq, i) => {
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -17,8 +39,13 @@ export function playFeierabendSound(): void {
   });
 }
 
+/**
+ * Plays a short milestone ping (A5, 880 Hz) using the Web Audio API.
+ *
+ * Silently does nothing when the Web Audio API is unavailable.
+ */
 export function playMilestoneSound(): void {
-  const AudioCtx = window.AudioContext ?? (window as unknown as Record<string, typeof AudioContext>)['webkitAudioContext'];
+  const AudioCtx = getAudioContext();
   if (!AudioCtx) return;
   const audioContext = new AudioCtx();
   const oscillator = audioContext.createOscillator();

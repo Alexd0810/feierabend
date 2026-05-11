@@ -1,5 +1,18 @@
 import type { Quote } from '../types';
 
+/**
+ * Motivational / humorous quotes grouped by how close to Feierabend the user is.
+ *
+ * | Key      | Shown when minutes remaining is… |
+ * |----------|----------------------------------|
+ * | `far`    | > 180 min                        |
+ * | `medium` | 61 – 180 min                     |
+ * | `close`  | 1 – 60 min                       |
+ * | `done`   | ≤ 0 min (Feierabend reached)      |
+ *
+ * Add new entries to any bucket to expand the rotation.
+ * The displayed quote rotates every {@link QUOTE_ROTATION_INTERVAL_MS} ms.
+ */
 export const quotes: Record<'far' | 'medium' | 'close' | 'done', Quote[]> = {
   far: [
     { text: "The journey of a thousand miles begins with a single step. Unfortunately, you have about 999 miles to go.", vibe: "REALISTIC" },

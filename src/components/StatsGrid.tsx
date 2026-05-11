@@ -1,19 +1,29 @@
 import type { Lesson } from "../types";
+import { DAY_START_MIN } from "../config";
 
-const DAY_START = 8 * 60;
-
-interface StatsGridProps {
+/** Props for {@link StatsGrid}. */
+export interface StatsGridProps {
+  /** All lessons for the day (may include cancelled ones). */
   lessons: Lesson[];
+  /** Current time as minutes since midnight. */
   currentMin: number;
+  /** Feierabend time as minutes since midnight. */
   feierabendMin: number;
 }
 
+/**
+ * Displays a 2×2 grid of at-a-glance statistics:
+ * - **Hours Survived** – hours elapsed since {@link DAY_START_MIN}.
+ * - **Lessons Done**   – percentage of non-cancelled lessons that have ended.
+ * - **Breaks Left**    – future gaps between consecutive lessons.
+ * - **Vibe Check**     – an informal mood label based on minutes remaining.
+ */
 export default function StatsGrid({
   lessons,
   currentMin,
   feierabendMin,
 }: StatsGridProps) {
-  const survived = Math.max(0, (currentMin - DAY_START) / 60);
+  const survived = Math.max(0, (currentMin - DAY_START_MIN) / 60);
 
   let lessonsCompleteText = "N/A";
   if (lessons.length > 0) {
