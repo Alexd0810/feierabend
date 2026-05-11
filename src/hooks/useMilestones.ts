@@ -66,9 +66,12 @@ export function useMilestones(minutesLeft: number, soundEnabled: boolean): UseMi
   const [activeMilestone, setActiveMilestone] = useState<MilestoneData | null>(null);
 
   useEffect(() => {
+    const triggered = triggeredRef.current;
+    if (!triggered) return;
+
     const today = new Date().toDateString();
     if (localStorage.getItem(STORAGE_KEY_RESET) !== today) {
-      triggeredRef.current!.clear();
+      triggered.clear();
       localStorage.setItem(STORAGE_KEY_TRIGGERED, '[]');
       localStorage.setItem(STORAGE_KEY_RESET, today);
     }
@@ -78,10 +81,10 @@ export function useMilestones(minutesLeft: number, soundEnabled: boolean): UseMi
       if (
         minutesLeft <= milestone.time &&
         minutesLeft > milestone.time - 1 &&
-        !triggeredRef.current!.has(key)
+        !triggered.has(key)
       ) {
-        triggeredRef.current!.add(key);
-        localStorage.setItem(STORAGE_KEY_TRIGGERED, JSON.stringify([...triggeredRef.current!]));
+        triggered.add(key);
+        localStorage.setItem(STORAGE_KEY_TRIGGERED, JSON.stringify([...triggered]));
         setActiveMilestone(milestone);
         if (soundEnabledRef.current) playMilestoneSound();
         break;
