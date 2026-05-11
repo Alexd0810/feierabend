@@ -1,13 +1,33 @@
 import type { Lesson, DayInfo } from "../types";
 import { minutesToTime } from "../utils/time";
 
-interface ScheduleTimelineProps {
+/** Props for {@link ScheduleTimeline}. */
+export interface ScheduleTimelineProps {
+  /** All lessons for the day, including cancelled ones. */
   lessons: Lesson[];
+  /** Current time as minutes since midnight. */
   currentMin: number;
+  /** Current day information computed by {@link useDayInfo}. */
   dayInfo: DayInfo;
-  replacements: Map<Lesson, Lesson>; // active -> cancelled it replaces
+  /**
+   * Maps each active replacement lesson to the cancelled lesson it covers.
+   * Built by {@link findReplacementLessons}.
+   */
+  replacements: Map<Lesson, Lesson>;
 }
 
+/**
+ * Renders a vertical timeline of today's full lesson schedule.
+ *
+ * Each item is styled according to its status:
+ * - `active`          – currently in progress
+ * - `past`            – already finished
+ * - `replacement`     – an active lesson filling a cancelled slot
+ * - `cancelled`       – a cancelled lesson
+ *
+ * Displays an empty-state message on weekends, work days, and lesson-free
+ * school days.
+ */
 export default function ScheduleTimeline({
   lessons,
   currentMin,

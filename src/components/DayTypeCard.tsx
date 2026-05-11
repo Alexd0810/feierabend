@@ -1,11 +1,21 @@
 import type { DayInfo } from "../types";
 
-interface DayTypeCardProps {
+/** Props for {@link DayTypeCard}. */
+export interface DayTypeCardProps {
+  /** Current day information computed by {@link useDayInfo}. */
   dayInfo: DayInfo;
 }
 
+/** Abbreviated day labels used in the weekly schedule strip. */
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+/**
+ * Explains the current day type (Weekend / School Day / Work Day) and renders
+ * a visual weekly schedule strip highlighting today.
+ *
+ * The explanation text adapts to the week parity so the user always understands
+ * why today has been classified the way it has.
+ */
 export default function DayTypeCard({ dayInfo }: DayTypeCardProps) {
   const {
     isWeekend,

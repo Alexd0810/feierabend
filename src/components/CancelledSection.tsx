@@ -1,11 +1,23 @@
 import type { Lesson } from "../types";
 import { minutesToTime } from "../utils/time";
 
-interface CancelledSectionProps {
+/** Props for {@link CancelledSection}. */
+export interface CancelledSectionProps {
+  /** All cancelled lessons for the day. */
   cancelled: Lesson[];
+  /**
+   * Maps each cancelled lesson to the active lesson that replaced its slot.
+   * Built by {@link findReplacementLessons}.
+   */
   cancelledWithReplacement: Map<Lesson, Lesson>;
 }
 
+/**
+ * Renders the list of cancelled lessons and, where applicable, indicates
+ * which lesson is covering that time slot as a replacement.
+ *
+ * Returns `null` when there are no cancelled lessons.
+ */
 export default function CancelledSection({
   cancelled,
   cancelledWithReplacement,

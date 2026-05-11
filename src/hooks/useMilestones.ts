@@ -1,52 +1,90 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { MilestoneData } from '../types';
 import { playMilestoneSound } from '../utils/audio';
+import { MILESTONES } from '../data/milestones';
 
-const MILESTONES: MilestoneData[] = [
-  { time: 60, emoji: '⏰', text: '1 HOUR LEFT!',   subtext: 'The final countdown begins!' },
-  { time: 30, emoji: '⚡', text: '30 MINUTES!',    subtext: 'You can almost taste it!' },
-  { time: 15, emoji: '🔥', text: '15 MINUTES!',    subtext: 'FREEDOM IS NEAR!' },
-  { time: 5,  emoji: '💨', text: '5 MINUTES!',     subtext: 'START PACKING!' },
-  { time: 1,  emoji: '🚀', text: '1 MINUTE!',      subtext: 'READY... SET...' },
-];
+/**
+ * LocalStorage key used to store which milestone keys have already fired
+ * today, preventing duplicate toasts on page reload.
+ */
+const STORAGE_KEY_TRIGGERED = 'milestonesTriggered';
 
+/** LocalStorage key that records the date of the last milestone reset. */
+const STORAGE_KEY_RESET = 'lastMilestoneReset';
+
+/**
+ * Loads the set of already-triggered milestone keys from `localStorage`,
+ * resetting it when the stored date no longer matches today.
+ *
+ * @returns A `Set` of milestone keys (e.g. `"milestone_60"`) that have
+ *          already fired today.
+ */
 function initTriggered(): Set<string> {
   const today = new Date().toDateString();
-  const lastReset = localStorage.getItem('lastMilestoneReset');
+  const lastReset = localStorage.getItem(STORAGE_KEY_RESET);
   if (lastReset !== today) {
-    localStorage.setItem('milestonesTriggered', '[]');
-    localStorage.setItem('lastMilestoneReset', today);
+    localStorage.setItem(STORAGE_KEY_TRIGGERED, '[]');
+    localStorage.setItem(STORAGE_KEY_RESET, today);
     return new Set<string>();
   }
-  return new Set<string>(JSON.parse(localStorage.getItem('milestonesTriggered') || '[]'));
+  return new Set<string>(JSON.parse(localStorage.getItem(STORAGE_KEY_TRIGGERED) || '[]'));
 }
 
-interface UseMilestonesResult {
+/** Return value of {@link useMilestones}. */
+export interface UseMilestonesResult {
+  /**
+   * The milestone that is currently being shown, or `null` when none is
+   * active.
+   */
   activeMilestone: MilestoneData | null;
+  /** Dismisses the active milestone toast immediately. */
   dismissMilestone: () => void;
 }
 
+/**
+ * Watches the countdown and fires milestone toasts when the remaining time
+ * crosses a threshold defined in `src/data/milestones.ts`.
+ *
+ * Each milestone fires **at most once per calendar day** — the triggered set
+ * is persisted in `localStorage` and reset at midnight.
+ *
+ * @param minutesLeft   - Minutes remaining until Feierabend.
+ * @param soundEnabled  - Whether to play an audio ping when a milestone fires.
+ * @returns The currently active milestone and a dismiss callback.
+ */
 export function useMilestones(minutesLeft: number, soundEnabled: boolean): UseMilestonesResult {
-  const triggeredRef = useRef<Set<string>>(null);
+  const triggeredRef = useRef<Set<string> | null>(null);
   if (!triggeredRef.current) {
     triggeredRef.current = initTriggered();
   }
 
+  // Keep soundEnabled in a ref so the effect closure always reads the latest
+  // value without needing to be re-created.
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
 
   const [activeMilestone, setActiveMilestone] = useState<MilestoneData | null>(null);
 
   useEffect(() => {
+    const triggered = triggeredRef.current;
+    if (!triggered) return;
+
+    const today = new Date().toDateString();
+    if (localStorage.getItem(STORAGE_KEY_RESET) !== today) {
+      triggered.clear();
+      localStorage.setItem(STORAGE_KEY_TRIGGERED, '[]');
+      localStorage.setItem(STORAGE_KEY_RESET, today);
+    }
+
     for (const milestone of MILESTONES) {
       const key = `milestone_${milestone.time}`;
       if (
         minutesLeft <= milestone.time &&
         minutesLeft > milestone.time - 1 &&
-        !triggeredRef.current!.has(key)
+        !triggered.has(key)
       ) {
-        triggeredRef.current!.add(key);
-        localStorage.setItem('milestonesTriggered', JSON.stringify([...triggeredRef.current!]));
+        triggered.add(key);
+        localStorage.setItem(STORAGE_KEY_TRIGGERED, JSON.stringify([...triggered]));
         setActiveMilestone(milestone);
         if (soundEnabledRef.current) playMilestoneSound();
         break;
