@@ -2,8 +2,6 @@
 
 Ein Countdown-Timer für Schüler und Arbeitnehmer – zeigt dir live, wie lange es noch bis zum Feierabend dauert.
 
-**Live:** [alexd0810.github.io/feierabend](https://alexd0810.github.io/feierabend/)
-
 ## Features
 
 - Echtzeit-Countdown bis zum Feierabend / Schulschluss
@@ -31,4 +29,3 @@ npm run dev
 ## Deployment
 
 Jeder Push auf `main` löst automatisch den GitHub Actions Workflow aus und deployt die App auf GitHub Pages.
-
