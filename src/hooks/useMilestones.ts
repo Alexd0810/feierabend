@@ -66,6 +66,13 @@ export function useMilestones(minutesLeft: number, soundEnabled: boolean): UseMi
   const [activeMilestone, setActiveMilestone] = useState<MilestoneData | null>(null);
 
   useEffect(() => {
+    const today = new Date().toDateString();
+    if (localStorage.getItem(STORAGE_KEY_RESET) !== today) {
+      triggeredRef.current!.clear();
+      localStorage.setItem(STORAGE_KEY_TRIGGERED, '[]');
+      localStorage.setItem(STORAGE_KEY_RESET, today);
+    }
+
     for (const milestone of MILESTONES) {
       const key = `milestone_${milestone.time}`;
       if (

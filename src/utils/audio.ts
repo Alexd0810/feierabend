@@ -6,6 +6,7 @@
  *          unavailable (e.g. in a test environment).
  */
 function getAudioContext(): typeof AudioContext | null {
+  if (typeof window === 'undefined') return null;
   return (
     window.AudioContext ??
     (window as unknown as Record<string, typeof AudioContext>)['webkitAudioContext'] ??

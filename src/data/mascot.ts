@@ -6,7 +6,8 @@ import type { MascotMood, MascotState } from '../types';
  * 1. Extend the `MascotMood` union in `src/types/index.ts`.
  * 2. Add a corresponding entry here.
  * 3. Update the `getMascotMood` function in `Mascot.tsx`.
- */export const mascotStates: Record<MascotMood, MascotState> = {
+ */
+export const mascotStates: Record<MascotMood, MascotState> = {
   fresh:       { emoji: ':D', messages: ["Let's do this!", "New day, new grind!", "Full energy!"] },
   normal:      { emoji: ':)', messages: ["Keep going!", "You got this!", "Stay focused!"] },
   tired:       { emoji: ':|', messages: ["Halfway there...", "Coffee break?", "Almost...", "Ugh"] },
