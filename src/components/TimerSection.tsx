@@ -42,7 +42,8 @@ export default function TimerSection({
   const currentMin = getCurrentMinutes(now);
   const dayLength = feierabendMin - DAY_START_MIN;
   const elapsed = currentMin - DAY_START_MIN;
-  const progress = Math.min(100, Math.max(0, (elapsed / dayLength) * 100));
+  const progress =
+    dayLength <= 0 ? 0 : Math.min(100, Math.max(0, (elapsed / dayLength) * 100));
 
   let timerLabel = "TIME UNTIL FEIERABEND";
   let showWorkBadge = false;

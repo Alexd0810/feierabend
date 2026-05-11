@@ -30,15 +30,15 @@ export function useTimetable(): UseTimetableResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (url: string, dedupe: typeof deduplicateLessons) => {
     setLoading(true);
     setError(false);
     try {
-      const response = await fetch(TIMETABLE_API_URL);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch');
       const json = await response.json() as TimetableData;
       if (json.lessons) {
-        json.lessons = deduplicateLessons(json.lessons);
+        json.lessons = dedupe(json.lessons);
       }
       setData(json);
     } catch {
@@ -48,11 +48,15 @@ export function useTimetable(): UseTimetableResult {
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-    const id = setInterval(fetchData, TIMETABLE_REFETCH_INTERVAL_MS);
-    return () => clearInterval(id);
+  const refetch = useCallback(() => {
+    void fetchData(TIMETABLE_API_URL, deduplicateLessons);
   }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  useEffect(() => {
+    refetch();
+    const id = setInterval(refetch, TIMETABLE_REFETCH_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [refetch]);
+
+  return { data, loading, error, refetch };
 }

@@ -53,7 +53,7 @@ export interface UseMilestonesResult {
  * @returns The currently active milestone and a dismiss callback.
  */
 export function useMilestones(minutesLeft: number, soundEnabled: boolean): UseMilestonesResult {
-  const triggeredRef = useRef<Set<string>>(null);
+  const triggeredRef = useRef<Set<string> | null>(null);
   if (!triggeredRef.current) {
     triggeredRef.current = initTriggered();
   }
