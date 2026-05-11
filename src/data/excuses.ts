@@ -1,3 +1,9 @@
+/**
+ * A collection of humorous excuses a user can generate to justify leaving
+ * early.
+ *
+ * Add new strings here to expand the pool — no other changes required.
+ */
 export const excuses: string[] = [
   "My goldfish is having an existential crisis and needs emotional support.",
   "I have a very important appointment with my couch.",

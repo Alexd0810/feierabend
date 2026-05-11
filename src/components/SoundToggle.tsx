@@ -1,8 +1,18 @@
-interface SoundToggleProps {
+/** Props for {@link SoundToggle}. */
+export interface SoundToggleProps {
+  /** Whether sound is currently enabled. */
   enabled: boolean;
+  /** Called when the user clicks the toggle button. */
   onToggle: () => void;
 }
 
+/**
+ * A floating button that allows the user to toggle Feierabend sounds on or
+ * off.
+ *
+ * The speaker icon arcs fade out when sound is disabled to provide a clear
+ * visual affordance.
+ */
 export default function SoundToggle({ enabled, onToggle }: SoundToggleProps) {
   return (
     <button

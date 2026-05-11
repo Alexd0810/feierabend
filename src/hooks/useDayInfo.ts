@@ -2,6 +2,17 @@ import { useState } from 'react';
 import type { DayInfo } from '../types';
 import { getWeekNumber } from '../utils/time';
 
+/**
+ * Derives {@link DayInfo} from the current date and any debug query-parameters
+ * present in the URL.
+ *
+ * Supported parameters:
+ * - `?mode=school|work|weekend` – override the day type.
+ * - `?week=even|odd`            – override the week parity.
+ *
+ * The result is computed once on mount and never changes for the lifetime of
+ * the page, so it is safe to read without a subscription.
+ */
 function computeDayInfo(): DayInfo {
   const params = new URLSearchParams(window.location.search);
   const debug = { mode: params.get('mode'), week: params.get('week') };
@@ -44,6 +55,14 @@ function computeDayInfo(): DayInfo {
   };
 }
 
+/**
+ * Returns stable {@link DayInfo} for the current page session.
+ *
+ * The value is computed once (on mount) and never re-computed, because the
+ * day type cannot change while the user has the page open.
+ *
+ * @returns Immutable day-info object.
+ */
 export function useDayInfo(): DayInfo {
   const [dayInfo] = useState<DayInfo>(computeDayInfo);
   return dayInfo;

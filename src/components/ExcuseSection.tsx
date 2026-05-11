@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { excuses } from "../data/excuses";
 
+/**
+ * Displays a button that picks a random excuse from the {@link excuses} pool
+ * and renders it below the button.
+ *
+ * This component is self-contained and accepts no props.
+ */
 export default function ExcuseSection() {
   const [excuse, setExcuse] = useState<string | null>(null);
 

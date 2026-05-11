@@ -12,6 +12,7 @@ import {
   getCancelledLessons,
   findReplacementLessons,
 } from "./utils/lessons";
+import { DAY_START_MIN, WORK_DAY_END_MIN } from "./config";
 import Background from "./components/Background";
 import DebugBanner from "./components/DebugBanner";
 import SoundToggle from "./components/SoundToggle";
@@ -31,22 +32,44 @@ import ExcuseSection from "./components/ExcuseSection";
 import ParkourSection from "./components/ParkourSection";
 import ScheduleTimeline from "./components/ScheduleTimeline";
 
-const WORK_DAY_END = 16 * 60;
-const DAY_START = 8 * 60;
-
+/**
+ * Determines the Feierabend time for the current day in minutes since midnight.
+ *
+ * - **Weekend**: returns `currentMin` so the countdown is always at zero.
+ * - **Work day**: returns {@link WORK_DAY_END_MIN} (16:00).
+ * - **School day with lessons**: returns the end time of the last non-cancelled
+ *   lesson.
+ * - **School day without lessons**: falls back to {@link WORK_DAY_END_MIN}.
+ *
+ * @param lessons    - Today's lesson list (may be empty).
+ * @param dayInfo    - Derived day-type information.
+ * @param currentMin - Current time as minutes since midnight.
+ */
 function getFeierabendTime(
   lessons: Lesson[],
   dayInfo: DayInfo,
   currentMin: number,
 ): number {
   if (dayInfo.isWeekend) return currentMin;
-  if (dayInfo.isWorkDay) return WORK_DAY_END;
-  if (!lessons || lessons.length === 0) return WORK_DAY_END;
+  if (dayInfo.isWorkDay) return WORK_DAY_END_MIN;
+  if (!lessons || lessons.length === 0) return WORK_DAY_END_MIN;
   const nonCancelled = lessons.filter((l) => !l.cancelled);
-  if (nonCancelled.length === 0) return WORK_DAY_END;
+  if (nonCancelled.length === 0) return WORK_DAY_END_MIN;
   return Math.max(...nonCancelled.map((l) => l.endMin));
 }
 
+/**
+ * Root application component.
+ *
+ * Orchestrates all hooks and passes derived state down to the individual
+ * section components. The component tree is intentionally flat at this level
+ * to make it easy to rearrange, add, or remove sections.
+ *
+ * **Adding a new section:**
+ * 1. Create the component in `src/components/`.
+ * 2. Import it here.
+ * 3. Add it inside the `{!loading && !error && (...)}` block.
+ */
 function App() {
   const dayInfo = useDayInfo();
   const { data: timetableData, loading, error, refetch } = useTimetable();
@@ -61,7 +84,7 @@ function App() {
   const feierabendMin = getFeierabendTime(lessons, dayInfo, currentMin);
   const secondsLeft = getSecondsUntil(feierabendMin, now);
   const minutesLeft = feierabendMin - currentMin;
-  const totalMinutes = feierabendMin - DAY_START;
+  const totalMinutes = feierabendMin - DAY_START_MIN;
 
   const { activeMilestone, dismissMilestone } = useMilestones(
     minutesLeft,

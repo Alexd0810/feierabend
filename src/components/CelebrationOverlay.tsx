@@ -1,11 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import { playFeierabendSound } from "../utils/audio";
 
-interface CelebrationOverlayProps {
+/** Props for {@link CelebrationOverlay}. */
+export interface CelebrationOverlayProps {
+  /** Whether the celebration overlay is visible and animating. */
   active: boolean;
+  /** Whether to play the Feierabend fanfare when the overlay activates. */
   soundEnabled: boolean;
 }
 
+/**
+ * Rotating headline texts shown during the celebration sequence.
+ * Add/change entries here to customise the copy.
+ */
 const TEXTS = [
   "FEIERABEND!",
   "FREEDOM!",
@@ -13,6 +20,8 @@ const TEXTS = [
   "LETS GO!",
   "PARTY TIME!",
 ];
+
+/** Confetti and firework colours. */
 const COLORS = [
   "#ff006e",
   "#fb5607",
@@ -21,8 +30,15 @@ const COLORS = [
   "#118ab2",
   "#7b2cbf",
 ];
+/** Emojis used in the floating-emoji animation. */
 const EMOJIS = ["🎉", "🥳", "🎊", "🍺", "🎈", "✨", "🌟", "💃", "🕺", "🎆"];
 
+/**
+ * Spawns 100 coloured confetti rectangles that fall from the top of the
+ * viewport using the `confettiFall` CSS animation.
+ *
+ * Each element is appended to `document.body` and self-removes after 5 s.
+ */
 function createConfetti() {
   for (let i = 0; i < 100; i++) {
     setTimeout(() => {
@@ -45,6 +61,10 @@ function createConfetti() {
   }
 }
 
+/**
+ * Spawns a single firework element at a random viewport position.
+ * Self-removes after 1 s.
+ */
 function createFirework() {
   const el = document.createElement("div");
   el.className = "firework";
@@ -56,6 +76,10 @@ function createFirework() {
   setTimeout(() => el.remove(), 1000);
 }
 
+/**
+ * Spawns a single floating emoji that rises from the bottom of the viewport.
+ * Self-removes after 3 s.
+ */
 function createFloatingEmoji() {
   const el = document.createElement("div");
   el.className = "party-emojis";
@@ -66,6 +90,20 @@ function createFloatingEmoji() {
   setTimeout(() => el.remove(), 3000);
 }
 
+/**
+ * Full-screen overlay that triggers when Feierabend is reached.
+ *
+ * On activation it:
+ * - plays the Feierabend fanfare (if sound is enabled),
+ * - launches a one-shot burst of 100 confetti pieces,
+ * - continuously spawns fireworks every 500 ms, and
+ * - floats random emojis every 300 ms.
+ *
+ * All DOM elements are appended to `document.body` and clean themselves up
+ * automatically so no manual cleanup is needed beyond unmounting.
+ *
+ * Returns `null` when `active` is `false`.
+ */
 export default function CelebrationOverlay({
   active,
   soundEnabled,

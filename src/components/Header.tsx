@@ -1,7 +1,14 @@
-interface HeaderProps {
+/** Props for {@link Header}. */
+export interface HeaderProps {
+  /** The current date/time, updated every second by {@link useTimer}. */
   now: Date;
 }
 
+/**
+ * Page header containing the app title and the live current-time display.
+ *
+ * The time is formatted in `de-DE` locale (HH:MM:SS).
+ */
 export default function Header({ now }: HeaderProps) {
   const timeStr = now.toLocaleTimeString("de-DE", {
     hour: "2-digit",
