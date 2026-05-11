@@ -1,0 +1,39 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    name: Open Pull Request to main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request if not exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          ACTOR="${{ github.actor }}"
+
+          EXISTING=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq length)
+
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "PR already exists for branch '$BRANCH', skipping."
+          else
+            gh pr create \
+              --title "feat: merge $BRANCH into main" \
+              --body "$(printf "## Summary\n\nAutomatically opened PR for branch \`%s\` pushed by @%s.\n\n> Please review before merging." "$BRANCH" "$ACTOR")" \
+              --base main \
+              --head "$BRANCH"
+            echo "PR created for branch '$BRANCH'."
+          fi
