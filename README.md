@@ -22,9 +22,8 @@ Ein Countdown-Timer für Schüler und Arbeitnehmer – zeigt dir live, wie lange
 ## Lokale Entwicklung
 
 ```bash
-corepack enable
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 ## Deployment
