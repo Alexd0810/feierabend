@@ -2,18 +2,18 @@
 
 ## Build, test, and lint commands
 
-- Install dependencies with `npm install` or `npm ci`.
-- Start local development with `npm run dev`.
-- Build the production app with `npm run build`. This runs `tsc -b` first, then builds the Vite app for GitHub Pages.
-- Run the full test suite with `npm run test`.
-- Run a single test file with `npm run test -- --runTestsByPath src\components\__tests__\Header.test.tsx`.
-- Run a single test case by name with `npm run test -- -t "renders the app title"`.
-- Run the Playwright end-to-end suite with `npm run test:e2e`.
-- Run one Playwright spec with `npm run test:e2e -- e2e/app.spec.ts`.
-- Generate coverage locally with `npm run test:coverage`.
-- Use `npm run test:ci` for the CI-style Jest run with coverage and JUnit output in `reports\junit.xml`.
-- Run lint checks with `npm run lint`.
-- Run formatting checks with `npm run format:check`.
+- Enable the pinned package manager with `corepack enable`, then install dependencies with `pnpm install`.
+- Start local development with `pnpm dev`.
+- Build the production app with `pnpm build`. This runs `tsc -b` first, then builds the Vite app for GitHub Pages.
+- Run the full test suite with `pnpm test`.
+- Run a single test file with `pnpm exec jest --runTestsByPath src\components\__tests__\Header.test.tsx`.
+- Run a single test case by name with `pnpm exec jest -t "renders the app title"`.
+- Run the Playwright end-to-end suite with `pnpm test:e2e`.
+- Run one Playwright spec with `pnpm test:e2e -- e2e/app.spec.ts`.
+- Generate coverage locally with `pnpm test:coverage`.
+- Use `pnpm test:ci` for the CI-style Jest run with coverage and JUnit output in `reports\junit.xml`.
+- Run lint checks with `pnpm lint`.
+- Run formatting checks with `pnpm format:check`.
 
 ## High-level architecture
 
@@ -27,7 +27,7 @@
 - Business logic is intentionally pushed into pure helpers in `src\utils\time.ts` and `src\utils\lessons.ts`. Components usually receive already-derived props rather than recomputing schedule logic internally.
 - Static content is data-driven. Quotes, excuses, milestone definitions, mascot states, and background video options live in `src\data\*.ts`, while the matching shared types live in `src\types\index.ts`.
 - GitHub Actions is part of the normal flow:
-  - `.github\workflows\ci.yml` runs `npm run test:ci` on pushes and pull requests to `main`.
+  - `.github\workflows\ci.yml` runs `pnpm test:ci` on pushes and pull requests to `main`.
   - `.github\workflows\deploy.yml` builds the app and publishes `dist` to GitHub Pages on pushes to `main`.
 - End-to-end coverage lives in `e2e\` and uses Playwright against a local Vite dev server defined in `playwright.config.ts`.
 
@@ -47,5 +47,6 @@
 - Tests are colocated in `__tests__` folders near the code they cover. Use the same pattern for new component, hook, utility, or data-module tests.
 - Jest runs in `jsdom` and already mocks CSS and asset imports via the top-level `__mocks__` folder, so frontend tests should continue using the existing Jest + Testing Library setup rather than introducing a second test runner.
 - Playwright e2e tests should intercept the timetable API instead of depending on the live backend. Existing e2e coverage uses `page.route()` to provide deterministic lesson data for debug-mode scenarios.
+- This repository is pinned to pnpm through the `packageManager` field in `package.json`, so dependency and CI changes should keep `pnpm-lock.yaml` authoritative instead of reintroducing `package-lock.json`.
 - ESLint currently ignores `dist` but not generated `coverage` output, so existing lint runs may include warnings from coverage artifacts if that folder is present.
 - Repository-scoped MCP servers for VS Code belong in `.vscode\mcp.json`. This repo includes a Playwright MCP server entry using `@playwright/mcp`.
