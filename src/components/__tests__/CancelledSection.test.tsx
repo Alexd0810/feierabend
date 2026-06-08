@@ -24,13 +24,15 @@ describe('CancelledSection', () => {
   it('renders the correct count text for one cancelled lesson', () => {
     const lesson = makeLesson();
     render(<CancelledSection cancelled={[lesson]} cancelledWithReplacement={new Map()} />);
-    expect(screen.getByText('1 lesson cancelled')).toBeInTheDocument();
+    expect(screen.getByText("Today's cancelled lessons")).toBeInTheDocument();
+    expect(screen.getByText('1 total')).toBeInTheDocument();
   });
 
   it('renders plural text for multiple cancelled lessons', () => {
     const lessons = [makeLesson({ subject: 'A' }), makeLesson({ subject: 'B' })];
     render(<CancelledSection cancelled={lessons} cancelledWithReplacement={new Map()} />);
-    expect(screen.getByText('2 lessons cancelled')).toBeInTheDocument();
+    expect(screen.getByText('2 total')).toBeInTheDocument();
+    expect(screen.getByText('Open gaps')).toBeInTheDocument();
   });
 
   it('displays subject and time for a cancelled lesson', () => {
@@ -44,8 +46,13 @@ describe('CancelledSection', () => {
     const cancelled = makeLesson({ subject: 'Math' });
     const replacement: Lesson = { ...makeLesson(), subject: 'History', cancelled: false };
     const map = new Map([[cancelled, replacement]]);
-    render(<CancelledSection cancelled={[cancelled]} cancelledWithReplacement={map} />);
-    expect(screen.getByText('History')).toBeInTheDocument();
-    expect(screen.getByText(/Replaced by/)).toBeInTheDocument();
+    const { container } = render(
+      <CancelledSection cancelled={[cancelled]} cancelledWithReplacement={map} />
+    );
+    expect(screen.getAllByText('Covered').length).toBeGreaterThan(0);
+    expect(container.querySelector('.cancelled-replacement-title')).toHaveTextContent(
+      'Replaced by History'
+    );
+    expect(screen.getByText(/History/)).toBeInTheDocument();
   });
 });
