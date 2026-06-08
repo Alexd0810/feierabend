@@ -31,7 +31,7 @@ describe('deduplicateLessons', () => {
 
   it('keeps lessons with different times', () => {
     const a = makeLesson({ startMin: 480 });
-    const b = makeLesson({ startMin: 570 });
+    const b = makeLesson({ startMin: 600, endMin: 690 });
     expect(deduplicateLessons([a, b])).toHaveLength(2);
   });
 
@@ -41,6 +41,36 @@ describe('deduplicateLessons', () => {
     const result = deduplicateLessons([a, b]);
     expect(result[0].startMin).toBe(480);
     expect(result[1].startMin).toBe(570);
+  });
+
+  it('combines adjacent 45-minute blocks into one 90-minute double lesson', () => {
+    const first = makeLesson({ subject: 'Math', room: '101', startMin: 480, endMin: 525 });
+    const second = makeLesson({ subject: 'Math', room: '101', startMin: 525, endMin: 570 });
+
+    const result = deduplicateLessons([first, second]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      subject: 'Math',
+      room: '101',
+      startMin: 480,
+      endMin: 570,
+      cancelled: false,
+    });
+  });
+
+  it('does not combine adjacent lessons when the total duration is not 90 minutes', () => {
+    const first = makeLesson({ subject: 'Math', room: '101', startMin: 480, endMin: 540 });
+    const second = makeLesson({ subject: 'Math', room: '101', startMin: 540, endMin: 585 });
+
+    expect(deduplicateLessons([first, second])).toHaveLength(2);
+  });
+
+  it('does not combine adjacent lessons when cancellation state differs', () => {
+    const first = makeLesson({ subject: 'Math', room: '101', startMin: 480, endMin: 525, cancelled: true });
+    const second = makeLesson({ subject: 'Math', room: '101', startMin: 525, endMin: 570, cancelled: false });
+
+    expect(deduplicateLessons([first, second])).toHaveLength(2);
   });
 });
 

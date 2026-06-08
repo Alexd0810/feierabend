@@ -1,21 +1,50 @@
 import type { Lesson } from '../types';
 
 /**
- * Removes duplicate lesson entries (same subject + time + room) and returns
- * the remaining lessons sorted by start time.
+ * Removes duplicate lesson entries (same subject + time + room), then merges
+ * contiguous double lessons into a single 90-minute entry.
  *
  * Duplicates can appear when the API returns overlapping entries.
+ * Double lessons are detected when two adjacent entries:
+ * - have the same subject, room, and cancellation state,
+ * - are directly contiguous, and
+ * - span 90 minutes together.
  *
  * @param lessons - Raw lesson array from the API.
- * @returns Deduplicated, time-sorted array.
+ * @returns Deduplicated, normalized, time-sorted array.
  */
 export function deduplicateLessons(lessons: Lesson[]): Lesson[] {
   const seen = new Map<string, Lesson>();
-  lessons.forEach(lesson => {
+  lessons.forEach((lesson) => {
     const key = `${lesson.subject}-${lesson.startMin}-${lesson.endMin}-${lesson.room}`;
     if (!seen.has(key)) seen.set(key, lesson);
   });
-  return Array.from(seen.values()).sort((a, b) => a.startMin - b.startMin);
+
+  const sorted = Array.from(seen.values()).sort((a, b) => a.startMin - b.startMin);
+  const merged: Lesson[] = [];
+
+  sorted.forEach((lesson) => {
+    const previous = merged[merged.length - 1];
+    const isDoubleLesson =
+      previous &&
+      previous.subject === lesson.subject &&
+      previous.room === lesson.room &&
+      previous.cancelled === lesson.cancelled &&
+      previous.endMin === lesson.startMin &&
+      lesson.endMin - previous.startMin === 90;
+
+    if (isDoubleLesson) {
+      merged[merged.length - 1] = {
+        ...previous,
+        endMin: lesson.endMin,
+      };
+      return;
+    }
+
+    merged.push(lesson);
+  });
+
+  return merged;
 }
 
 /**

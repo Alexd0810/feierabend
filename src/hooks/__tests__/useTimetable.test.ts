@@ -62,6 +62,28 @@ describe('useTimetable', () => {
     expect(result.current.data?.lessons).toHaveLength(1);
   });
 
+  it('merges adjacent double lessons from the API response', async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        lessons: [
+          { subject: 'Math', room: '101', startMin: 480, endMin: 525, cancelled: false },
+          { subject: 'Math', room: '101', startMin: 525, endMin: 570, cancelled: false },
+        ],
+      }),
+    } as Response);
+
+    const { result } = renderHook(() => useTimetable());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.data?.lessons).toEqual([
+      { subject: 'Math', room: '101', startMin: 480, endMin: 570, cancelled: false },
+    ]);
+  });
+
   it('sets error state when fetch fails', async () => {
     globalThis.fetch = jest.fn().mockRejectedValue(new Error('network error'));
 
