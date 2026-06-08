@@ -26,6 +26,29 @@ npm install
 npm run dev
 ```
 
+## Tests
+
+```bash
+npm run test
+npm run test:e2e
+```
+
+Einzelne Playwright-Datei:
+
+```bash
+npm run test:e2e -- e2e/app.spec.ts
+```
+
+Für die lokale Erstinstallation von Playwright-Browsern:
+
+```bash
+npx playwright install chromium
+```
+
+## MCP Server
+
+Für VS Code liegt eine Repository-Konfiguration unter `.vscode/mcp.json`, die den offiziellen Playwright-MCP-Server (`@playwright/mcp`) bereitstellt. Nach dem Öffnen des Projekts in VS Code kann der Server über die MCP-Ansicht gestartet werden.
+
 ## Deployment
 
 Jeder Push auf `main` löst automatisch den GitHub Actions Workflow aus und deployt die App auf GitHub Pages.

@@ -8,6 +8,8 @@
 - Run the full test suite with `npm run test`.
 - Run a single test file with `npm run test -- --runTestsByPath src\components\__tests__\Header.test.tsx`.
 - Run a single test case by name with `npm run test -- -t "renders the app title"`.
+- Run the Playwright end-to-end suite with `npm run test:e2e`.
+- Run one Playwright spec with `npm run test:e2e -- e2e/app.spec.ts`.
 - Generate coverage locally with `npm run test:coverage`.
 - Use `npm run test:ci` for the CI-style Jest run with coverage and JUnit output in `reports\junit.xml`.
 - Run lint checks with `npm run lint`.
@@ -27,6 +29,7 @@
 - GitHub Actions is part of the normal flow:
   - `.github\workflows\ci.yml` runs `npm run test:ci` on pushes and pull requests to `main`.
   - `.github\workflows\deploy.yml` builds the app and publishes `dist` to GitHub Pages on pushes to `main`.
+- End-to-end coverage lives in `e2e\` and uses Playwright against a local Vite dev server defined in `playwright.config.ts`.
 
 ## Key conventions
 
@@ -43,4 +46,6 @@
 - When extending content keyed by unions, update both the type definition and the data record. For example, new background video channels require changes in both `src\types\index.ts` and `src\data\videos.ts`.
 - Tests are colocated in `__tests__` folders near the code they cover. Use the same pattern for new component, hook, utility, or data-module tests.
 - Jest runs in `jsdom` and already mocks CSS and asset imports via the top-level `__mocks__` folder, so frontend tests should continue using the existing Jest + Testing Library setup rather than introducing a second test runner.
+- Playwright e2e tests should intercept the timetable API instead of depending on the live backend. Existing e2e coverage uses `page.route()` to provide deterministic lesson data for debug-mode scenarios.
 - ESLint currently ignores `dist` but not generated `coverage` output, so existing lint runs may include warnings from coverage artifacts if that folder is present.
+- Repository-scoped MCP servers for VS Code belong in `.vscode\mcp.json`. This repo includes a Playwright MCP server entry using `@playwright/mcp`.
